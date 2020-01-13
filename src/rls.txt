@@ -1,0 +1,12 @@
+
+In the DOS box:
+```
+C:\ rustup update nightly
+C:\ rustup component add --toolchain nightly rls-preview rust-analysis rust-src
+```
+Sometimes this will fail with:
+```
+warning: component 'rls-preview' is not available anymore on target 'x86_64-pc-windows-msvc'
+```
+Because these compenents don't get built with every nightly.
+

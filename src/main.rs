@@ -2,16 +2,15 @@
 
 use std::time::Instant;
 
-const MAX: usize = 4096;
+const MAX: usize = 8192;
 const BLOCK_SIZE: usize = 64;
 const BLOCKS: usize = MAX / BLOCK_SIZE;
 
 mod output;
-use crate::output::main_c2rust;
 
 use unchecked_index::unchecked_index;
 
-type T = [[f32; MAX]];
+type T = [[i32; MAX]];
 
 #[allow(clippy::all)]
 fn do_it_0(a: &mut T, b: &T) {
@@ -125,11 +124,11 @@ fn do_it_6 (a: &mut T, b: &T) {
 
 fn fill_arrays(a: &mut T, b: &mut T) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
-        let mut val = 0.0f32;
+        let mut val = 0i32;
         for j in 0..MAX {
             row[j] = val;
             b[j][i] = -val;
-            val += 1.0f32;
+            val += 1i32;
         }
     }
 }
@@ -148,8 +147,8 @@ fn main() {
     println!("MAX:        {:?}, ", MAX);
     println!("BLOCK_SIZE: {:?}, ", BLOCK_SIZE);
 
-    let mut a = vec![[9f32; MAX]; MAX];
-    let mut b = vec![[10f32; MAX]; MAX];
+    let mut a = vec![[9i32; MAX]; MAX];
+    let mut b = vec![[10i32; MAX]; MAX];
 
     let futs = [do_it_0, do_it_1, do_it_2, do_it_3, do_it_4, do_it_5, do_it_6].to_vec();
 
@@ -161,5 +160,5 @@ fn main() {
         println!("do_it_{}:    {}us", i, elapsed);
         //print_array(&a);
     }
-    main_c2rust();
+    output::main_();
 }

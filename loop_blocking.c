@@ -3,25 +3,24 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#define MAX 4096
+#define MAX 8192
 #define BLOCK_SIZE 64
-#define BLOCKS MAX / BLOCK_SIZE
 
-typedef float board[MAX][MAX];
+typedef int32_t board[MAX][MAX];
 
-void do_it_0 (float a[MAX][MAX], float b[MAX][MAX]) {
-    for (int i = 0; i < MAX;     i++) {
-        for (int j = 0; j < MAX; j++) {
+void do_it_0 (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
+    for (size_t i = 0; i < MAX;     i++) {
+        for (size_t j = 0; j < MAX; j++) {
             a[i][j] += b[j][i];
         }
     }
 }
 
-void do_it_1 (float a[MAX][MAX], float b[MAX][MAX]) {
-    for (int i = 0; i < MAX; i += BLOCK_SIZE) {
-        for (int j = 0; j < MAX; j += BLOCK_SIZE) {
-            for (int ii = i; ii < i + BLOCK_SIZE; ii++) {
-                for (int jj = j; jj < j + BLOCK_SIZE; jj++) {
+void do_it_1 (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
+    for (size_t i = 0; i < MAX; i += BLOCK_SIZE) {
+        for (size_t j = 0; j < MAX; j += BLOCK_SIZE) {
+            for (size_t ii = i; ii < i + BLOCK_SIZE; ii++) {
+                for (size_t jj = j; jj < j + BLOCK_SIZE; jj++) {
                     a[ii][jj] += b[jj][ii];
                 }
              }
@@ -29,10 +28,10 @@ void do_it_1 (float a[MAX][MAX], float b[MAX][MAX]) {
     }
 }
 
-void fill_arrays (float a[MAX][MAX], float b[MAX][MAX]) {
-    float count = 0.0; 
-    for (int i = 0; i < MAX; i++) {
-        for (int j =0; j < MAX; j++) {
+void fill_arrays (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
+    int32_t count = 0.0; 
+    for (size_t i = 0; i < MAX; i++) {
+        for (size_t j =0; j < MAX; j++) {
             a[i][j] = count;
             b[j][i] = -count;
             count += 1.0;
@@ -40,9 +39,9 @@ void fill_arrays (float a[MAX][MAX], float b[MAX][MAX]) {
     }
 }
 
-void print_array (float a[MAX][MAX]) {
-    for (int i = 0; i < 32; i++) {
-        for (int j = 0; j < 32; j++) {
+void print_array (int32_t a[MAX][MAX]) {
+    for (size_t i = 0; i < 32; i++) {
+        for (size_t j = 0; j < 32; j++) {
             printf("%.0f, ", a[i][j]);
         }
         printf("\n");
@@ -60,8 +59,8 @@ int main () {
     printf("MAX:        %d\n", MAX);
     printf("BLOCK_SIZE: %d\n", BLOCK_SIZE);
 
-    float (*a)[4096] = malloc(MAX * MAX * sizeof(float));
-    float (*b)[4096] = malloc(MAX * MAX * sizeof(float));
+    int32_t (*a)[MAX * MAX] = malloc(MAX * MAX * sizeof(int32_t));
+    int32_t (*b)[MAX * MAX] = malloc(MAX * MAX * sizeof(int32_t));
 
     {
         fill_arrays(a, b);

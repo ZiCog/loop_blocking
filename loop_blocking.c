@@ -67,7 +67,7 @@ int main () {
         uint64_t startTime = time_ns();
         do_it_0(a, b);
         uint64_t endTime = time_ns();
-        printf ("do_it_0:    %" PRIu64 "us\n", (endTime - startTime) / 1000U);
+        printf ("do_it_0:    %" PRIu64 "ms\n", (endTime - startTime) / 1000000U);
         //print_array(a);
     }
     {
@@ -75,7 +75,7 @@ int main () {
         uint64_t startTime = time_ns();
         do_it_1(a, b);
         uint64_t endTime = time_ns();
-        printf ("do_it_1:    %" PRIu64 "us\n", (endTime - startTime) / 1000U);
+        printf ("do_it_1:    %" PRIu64 "ms\n", (endTime - startTime) / 1000000U);
         //print_array(a);
     }
 }

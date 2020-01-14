@@ -130,16 +130,16 @@ fill_arrays(a as *mut [int32_t; 8192], b as *mut [int32_t; 8192]);
 let mut startTime: uint64_t = time_ns();
 do_it_0(a as *mut [int32_t; 8192], b as *mut [int32_t; 8192]);
 let mut endTime: uint64_t = time_ns();
-printf(b"do_it_0:    %luus\n\x00" as *const u8 as *const libc::c_char,
-      endTime.wrapping_sub(startTime).wrapping_div(1000 as libc::c_uint
-                                                       as
+printf(b"do_it_0:    %lums\n\x00" as *const u8 as *const libc::c_char,
+      endTime.wrapping_sub(startTime).wrapping_div(1000000 as
+                                                       libc::c_uint as
                                                        libc::c_ulong));
 fill_arrays(a as *mut [int32_t; 8192], b as *mut [int32_t; 8192]);
 let mut startTime_0: uint64_t = time_ns();
 do_it_1(a as *mut [int32_t; 8192], b as *mut [int32_t; 8192]);
 let mut endTime_0: uint64_t = time_ns();
-printf(b"do_it_1:    %luus\n\x00" as *const u8 as *const libc::c_char,
-      endTime_0.wrapping_sub(startTime_0).wrapping_div(1000 as
+printf(b"do_it_1:    %lums\n\x00" as *const u8 as *const libc::c_char,
+      endTime_0.wrapping_sub(startTime_0).wrapping_div(1000000 as
                                                            libc::c_uint
                                                            as
                                                            libc::c_ulong));

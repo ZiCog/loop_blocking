@@ -78,7 +78,7 @@ fn do_it_4(a: &mut T, b: &T) {
 fn do_it_5 (a: &mut T, b: &T) {
     unsafe {
         let mut a = unchecked_index(a);
-        let mut b = unchecked_index(b);
+        let b = unchecked_index(b);
         let mut i: usize = 0;
         while i < MAX {
             let mut j: usize = 0;
@@ -156,8 +156,8 @@ fn main() {
         fill_arrays(&mut a, &mut b);
         let then = Instant::now();
         fut(&mut a, &b);
-        let elapsed = then.elapsed().as_micros();
-        println!("do_it_{}:    {}us", i, elapsed);
+        let elapsed = then.elapsed().as_millis();
+        println!("do_it_{}:    {}ms", i, elapsed);
         //print_array(&a);
     }
     output::main_();

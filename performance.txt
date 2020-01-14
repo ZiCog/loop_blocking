@@ -1,0 +1,55 @@
+Rust on x86_64:
+```
+$ RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo run  --release
+MAX:        8192,
+BLOCK_SIZE: 64,
+do_it_0:    808ms
+do_it_1:    803ms
+do_it_2:    201ms
+do_it_3:    282ms
+do_it_4:    202ms
+do_it_5:    188ms
+do_it_6:    188ms
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    836ms
+do_it_1:    164ms
+```
+C on x86_64:
+```
+$ gcc -Wall -O3 -o loop_blocking loop_blocking.c
+$ ./loop_blocking
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    812ms
+do_it_1:    170ms
+```
+
+Rust on ARM aarch64:
+```
+$ RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo run  --release
+...
+MAX:        8192,
+BLOCK_SIZE: 64,
+do_it_0:    15060ms
+do_it_1:    15081ms
+do_it_2:    11525ms
+do_it_3:    12351ms
+do_it_4:    11512ms
+do_it_5:    11431ms
+do_it_6:    11424ms
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    9453ms
+do_it_1:    3021ms
+```
+
+C on ARM aarch64:
+```
+$ gcc -Wall -O3 -o loop_blocking loop_blocking.c
+$ ./loop_blocking
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    13527ms
+do_it_1:    3020ms
+```

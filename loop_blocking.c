@@ -6,8 +6,6 @@
 #define MAX 8192
 #define BLOCK_SIZE 64
 
-typedef int32_t board[MAX][MAX];
-
 void do_it_0 (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
     for (size_t i = 0; i < MAX;     i++) {
         for (size_t j = 0; j < MAX; j++) {
@@ -16,7 +14,7 @@ void do_it_0 (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
     }
 }
 
-void do_it_1 (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
+void do_it_1 (int32_t a[MAX][MAX], int32_t b[][MAX]) {
     for (size_t i = 0; i < MAX; i += BLOCK_SIZE) {
         for (size_t j = 0; j < MAX; j += BLOCK_SIZE) {
             for (size_t ii = i; ii < i + BLOCK_SIZE; ii++) {
@@ -42,7 +40,7 @@ void fill_arrays (int32_t a[MAX][MAX], int32_t b[MAX][MAX]) {
 void print_array (int32_t a[MAX][MAX]) {
     for (size_t i = 0; i < 32; i++) {
         for (size_t j = 0; j < 32; j++) {
-            printf("%.0f, ", a[i][j]);
+            printf("%d, ", a[i][j]);
         }
         printf("\n");
     }
@@ -59,8 +57,10 @@ int main () {
     printf("MAX:        %d\n", MAX);
     printf("BLOCK_SIZE: %d\n", BLOCK_SIZE);
 
-    int32_t (*a)[MAX * MAX] = malloc(MAX * MAX * sizeof(int32_t));
-    int32_t (*b)[MAX * MAX] = malloc(MAX * MAX * sizeof(int32_t));
+    int32_t (*a)[MAX];
+    a = malloc(sizeof(*a) * MAX);
+    int32_t (*b)[MAX];
+    b = malloc(sizeof(*b) * MAX);
 
     {
         fill_arrays(a, b);
@@ -78,5 +78,7 @@ int main () {
         printf ("do_it_1:    %" PRIu64 "ms\n", (endTime - startTime) / 1000000U);
         //print_array(a);
     }
+    free(a);
+    free(b);
 }
 

@@ -54,6 +54,6 @@ $ gcc -Wall -O3 -o loop_blocking loop_blocking.c
 $ ./loop_blocking
 MAX:        8192
 BLOCK_SIZE: 64
-do_it_0:    13527ms
-do_it_1:    3020ms
+do_it_0:    17707ms
+do_it_1:    3385ms
 ```

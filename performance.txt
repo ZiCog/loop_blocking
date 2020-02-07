@@ -1,18 +1,20 @@
 Rust on x86_64:
 ```
-$ RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo run  --release
+$ cargo run  --release
+Rust functions:
 MAX:        8192,
 BLOCK_SIZE: 64,
-do_it_0:    808ms
-do_it_1:    803ms
-do_it_2:    201ms
-do_it_3:    282ms
-do_it_4:    202ms
-do_it_5:    188ms
-do_it_6:    188ms
+do_it_0:    802ms
+do_it_1:    802ms
+do_it_2:    197ms
+do_it_3:    281ms
+do_it_4:    199ms
+do_it_5:    186ms
+do_it_6:    187ms
+C functions (via rustc):
 MAX:        8192
 BLOCK_SIZE: 64
-do_it_0:    836ms
+do_it_0:    827ms
 do_it_1:    164ms
 ```
 C on x86_64:
@@ -27,8 +29,9 @@ do_it_1:    170ms
 
 Rust on ARM aarch64:
 ```
-$ RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo run  --release
+$ cargo run  --release
 ...
+Rust functions:
 MAX:        8192,
 BLOCK_SIZE: 64,
 do_it_0:    15060ms
@@ -38,6 +41,7 @@ do_it_3:    12351ms
 do_it_4:    11512ms
 do_it_5:    11431ms
 do_it_6:    11424ms
+C functions (via rustc):
 MAX:        8192
 BLOCK_SIZE: 64
 do_it_0:    9453ms

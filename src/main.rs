@@ -6,7 +6,7 @@ const MAX: usize = 8192;
 const BLOCK_SIZE: usize = 64;
 const BLOCKS: usize = MAX / BLOCK_SIZE;
 
-mod output;
+mod rustc_output;
 
 use unchecked_index::unchecked_index;
 
@@ -78,7 +78,7 @@ fn do_it_4(a: &mut T, b: &T) {
 fn do_it_5 (a: &mut T, b: &T) {
     unsafe {
         let mut a = unchecked_index(a);
-        let b = unchecked_index(b);
+        let mut b = unchecked_index(b);
         let mut i: usize = 0;
         while i < MAX {
             let mut j: usize = 0;
@@ -143,7 +143,66 @@ fn print_array(a: &T) {
     }
 }
 
-fn main() {
+#[derive(Debug, Clone)]
+struct Block {
+    b : Vec<i32>
+}
+
+impl Block {
+    fn new () -> Block {
+        Block {
+            b: vec![0; BLOCK_SIZE * BLOCK_SIZE]
+        }
+    }
+
+    fn get (&self, i: usize, j: usize) -> i32 {
+        self.b[i * BLOCK_SIZE + j]
+    }
+
+    fn set (&mut self, i: usize, j: usize, value: i32) {
+        self.b[i * BLOCK_SIZE + j] = value;
+    }
+
+    fn add (&mut self, other: &Block) {
+        for i in 0..BLOCK_SIZE {
+            for j in 0..BLOCK_SIZE {
+                let value: i32 = self.get(i, j) + other.get(i, j);
+                self.set(i, j, value);
+            }
+        }    
+    }
+
+    fn add_transpose (&mut self, other: &Block) {
+        for i in 0..BLOCK_SIZE {
+            for j in 0..BLOCK_SIZE {
+                let value: i32 = self.get(i, j) + other.get(j, i);
+                self.set(i, j, value);
+            }
+        }    
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Array {
+    a: Vec<Block>
+}
+
+impl Array {
+    fn new () -> Array {
+        Array {
+            a: vec!(Block::new(); MAX / BLOCK_SIZE * MAX / BLOCK_SIZE),
+        }
+    }
+}
+
+
+pub fn main() {
+    let block  = vec![0; 64 * 64];
+    let block  = Block::new();
+
+    let array = Array::new();
+
+    println!("Rust functions:");
     println!("MAX:        {:?}, ", MAX);
     println!("BLOCK_SIZE: {:?}, ", BLOCK_SIZE);
 
@@ -158,7 +217,8 @@ fn main() {
         fut(&mut a, &b);
         let elapsed = then.elapsed().as_millis();
         println!("do_it_{}:    {}ms", i, elapsed);
-        //print_array(&a);
     }
-    output::main_();
+
+    println!("C functions (via rustc):");
+    rustc_output::main_();
 }

@@ -48,9 +48,9 @@ void print_array (int32_t a[MAX][MAX]) {
 
 // Return a timestamp in nano second resolution.
 uint64_t time_ns( void ) {
-  struct timespec now;
-  clock_gettime( CLOCK_MONOTONIC, &now );
-  return (uint64_t)now.tv_sec * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
+    struct timespec now;
+    clock_gettime( CLOCK_MONOTONIC, &now );
+    return (uint64_t)now.tv_sec * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
 }
 
 int main () {

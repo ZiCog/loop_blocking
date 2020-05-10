@@ -20,7 +20,7 @@ type T = [[i32; MAX]];
 ///////////////////////// Slow non-loop-blocking transpose /////////////////////
 
 #[allow(clippy::all)]
-fn transpose_0(a: &mut T, b: &T) {
+fn transpose_0(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     assert!(a.len() <= MAX);
     assert!(b.len() <= MAX);
     for i in 0..MAX {
@@ -30,7 +30,7 @@ fn transpose_0(a: &mut T, b: &T) {
     }
 }
 
-fn transpose_1(a: &mut T, b: &T) {
+fn transpose_1(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
         for j in 0..MAX {
             row[j] += b[j][i];
@@ -41,7 +41,7 @@ fn transpose_1(a: &mut T, b: &T) {
 ///////////////////////// Fast loop-blocking transpose /////////////////////////
 
 #[allow(clippy::needless_range_loop)]
-fn transpose_2(a: &mut T, b: &T) {
+fn transpose_2(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     for i in 00..(MAX / BLOCK_SIZE) {
         for j in 00..(MAX / BLOCK_SIZE) {
             for ii in (i * BLOCK_SIZE)..((i * BLOCK_SIZE) + BLOCK_SIZE) {
@@ -53,7 +53,7 @@ fn transpose_2(a: &mut T, b: &T) {
     }
 }
 
-fn transpose_3(a: &mut T, b: &T) {
+fn transpose_3(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     for s in 0..BLOCKS {
         for t in 0..BLOCKS {
             a.iter_mut()
@@ -74,7 +74,7 @@ fn transpose_3(a: &mut T, b: &T) {
 }
 
 #[allow(clippy::needless_range_loop)]
-fn transpose_4(a: &mut T, b: &T) {
+fn transpose_4(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     for i in (0..MAX).step_by(BLOCK_SIZE) {
         for j in (0..MAX).step_by(BLOCK_SIZE) {
             for ii in i..i + BLOCK_SIZE {
@@ -86,10 +86,10 @@ fn transpose_4(a: &mut T, b: &T) {
     }
 }
 
-fn transpose_5 (a: &mut T, b: &T) {
+fn transpose_5(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     unsafe {
         let mut a = unchecked_index(a);
-        let mut b = unchecked_index(b);
+        let b = unchecked_index(b);
         let mut i: usize = 0;
         while i < MAX {
             let mut j: usize = 0;
@@ -110,7 +110,7 @@ fn transpose_5 (a: &mut T, b: &T) {
     }
 }
 
-fn transpose_6 (a: &mut T, b: &T) {
+fn transpose_6(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     unsafe {
         let mut i: usize = 0;
         while i < MAX {
@@ -120,8 +120,8 @@ fn transpose_6 (a: &mut T, b: &T) {
                 while ii < i + BLOCK_SIZE {
                     let mut jj = j;
                     while jj < j + BLOCK_SIZE {
-                        *a.get_unchecked_mut(ii).get_unchecked_mut(jj) += 
-                        b.get_unchecked(jj).get_unchecked(ii);
+                        *a.get_unchecked_mut(ii).get_unchecked_mut(jj) +=
+                            b.get_unchecked(jj).get_unchecked(ii);
                         jj += 1
                     }
                     ii += 1
@@ -133,7 +133,7 @@ fn transpose_6 (a: &mut T, b: &T) {
     }
 }
 
-fn fill_arrays(a: &mut T, b: &mut T) {
+fn fill_arrays(a: &mut [[i32; MAX]; MAX], b: &mut [[i32; MAX]; MAX]) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
         let mut val = 0i32;
         for j in 0..MAX {
@@ -154,73 +154,34 @@ fn print_array(a: &T) {
     }
 }
 
-#[derive(Debug, Clone)]
-struct Block {
-    b : Vec<i32>
-}
-
-impl Block {
-    fn new () -> Block {
-        Block {
-            b: vec![0; BLOCK_SIZE * BLOCK_SIZE]
-        }
-    }
-
-    fn get (&self, i: usize, j: usize) -> i32 {
-        self.b[i * BLOCK_SIZE + j]
-    }
-
-    fn set (&mut self, i: usize, j: usize, value: i32) {
-        self.b[i * BLOCK_SIZE + j] = value;
-    }
-
-    fn add (&mut self, other: &Block) {
-        for i in 0..BLOCK_SIZE {
-            for j in 0..BLOCK_SIZE {
-                let value: i32 = self.get(i, j) + other.get(i, j);
-                self.set(i, j, value);
-            }
-        }    
-    }
-
-    fn add_transpose (&mut self, other: &Block) {
-        for i in 0..BLOCK_SIZE {
-            for j in 0..BLOCK_SIZE {
-                let value: i32 = self.get(i, j) + other.get(j, i);
-                self.set(i, j, value);
-            }
-        }    
-    }
-}
-
-#[derive(Debug, Clone)]
-struct Array {
-    a: Vec<Block>
-}
-
-impl Array {
-    fn new () -> Array {
-        Array {
-            a: vec!(Block::new(); MAX / BLOCK_SIZE * MAX / BLOCK_SIZE),
-        }
-    }
-}
-
-
 pub fn main() {
-    let block  = vec![0; 64 * 64];
-    let block  = Block::new();
-
-    let array = Array::new();
-
     println!("Rust functions:");
     println!("MAX:        {:?}, ", MAX);
     println!("BLOCK_SIZE: {:?}, ", BLOCK_SIZE);
 
-    let mut a = vec![[9i32; MAX]; MAX];
-    let mut b = vec![[10i32; MAX]; MAX];
+    let mut a = unsafe {
+        let layout = std::alloc::Layout::new::<[[i32; MAX]; MAX]>();
+        let ptr = std::alloc::alloc_zeroed(layout) as *mut [[i32; MAX]; MAX];
+        Box::from_raw(ptr)
+    };
+    let mut b = unsafe {
+        let layout = std::alloc::Layout::new::<[[i32; MAX]; MAX]>();
+        let ptr = std::alloc::alloc_zeroed(layout) as *mut [[i32; MAX]; MAX];
+        Box::from_raw(ptr)
+    };
 
-    let futs = [transpose_0, transpose_1, transpose_2, transpose_3, transpose_4, transpose_5, transpose_6].to_vec();
+    println!("allocated");
+
+    let futs = [
+        transpose_0,
+        transpose_1,
+        transpose_2,
+        transpose_3,
+        transpose_4,
+        transpose_5,
+        transpose_6,
+    ]
+    .to_vec();
 
     for (i, fut) in futs.iter().enumerate() {
         fill_arrays(&mut a, &mut b);

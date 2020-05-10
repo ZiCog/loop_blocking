@@ -1,3 +1,8 @@
+//
+// Various attempts at trying to write a large matrix transpose function
+// in a cache friendly way.
+//
+//
 #![feature(register_tool)]
 
 use std::time::Instant;
@@ -12,8 +17,12 @@ use unchecked_index::unchecked_index;
 
 type T = [[i32; MAX]];
 
+///////////////////////// Slow non-loop-blocking transpose /////////////////////
+
 #[allow(clippy::all)]
-fn do_it_0(a: &mut T, b: &T) {
+fn transpose_0(a: &mut T, b: &T) {
+    assert!(a.len() <= MAX);
+    assert!(b.len() <= MAX);
     for i in 0..MAX {
         for j in 0..MAX {
             a[i][j] += b[j][i];
@@ -21,7 +30,7 @@ fn do_it_0(a: &mut T, b: &T) {
     }
 }
 
-fn do_it_1(a: &mut T, b: &T) {
+fn transpose_1(a: &mut T, b: &T) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
         for j in 0..MAX {
             row[j] += b[j][i];
@@ -29,8 +38,10 @@ fn do_it_1(a: &mut T, b: &T) {
     }
 }
 
+///////////////////////// Fast loop-blocking transpose /////////////////////////
+
 #[allow(clippy::needless_range_loop)]
-fn do_it_2(a: &mut T, b: &T) {
+fn transpose_2(a: &mut T, b: &T) {
     for i in 00..(MAX / BLOCK_SIZE) {
         for j in 00..(MAX / BLOCK_SIZE) {
             for ii in (i * BLOCK_SIZE)..((i * BLOCK_SIZE) + BLOCK_SIZE) {
@@ -42,7 +53,7 @@ fn do_it_2(a: &mut T, b: &T) {
     }
 }
 
-fn do_it_3(a: &mut T, b: &T) {
+fn transpose_3(a: &mut T, b: &T) {
     for s in 0..BLOCKS {
         for t in 0..BLOCKS {
             a.iter_mut()
@@ -63,7 +74,7 @@ fn do_it_3(a: &mut T, b: &T) {
 }
 
 #[allow(clippy::needless_range_loop)]
-fn do_it_4(a: &mut T, b: &T) {
+fn transpose_4(a: &mut T, b: &T) {
     for i in (0..MAX).step_by(BLOCK_SIZE) {
         for j in (0..MAX).step_by(BLOCK_SIZE) {
             for ii in i..i + BLOCK_SIZE {
@@ -75,7 +86,7 @@ fn do_it_4(a: &mut T, b: &T) {
     }
 }
 
-fn do_it_5 (a: &mut T, b: &T) {
+fn transpose_5 (a: &mut T, b: &T) {
     unsafe {
         let mut a = unchecked_index(a);
         let mut b = unchecked_index(b);
@@ -99,7 +110,7 @@ fn do_it_5 (a: &mut T, b: &T) {
     }
 }
 
-fn do_it_6 (a: &mut T, b: &T) {
+fn transpose_6 (a: &mut T, b: &T) {
     unsafe {
         let mut i: usize = 0;
         while i < MAX {
@@ -209,14 +220,14 @@ pub fn main() {
     let mut a = vec![[9i32; MAX]; MAX];
     let mut b = vec![[10i32; MAX]; MAX];
 
-    let futs = [do_it_0, do_it_1, do_it_2, do_it_3, do_it_4, do_it_5, do_it_6].to_vec();
+    let futs = [transpose_0, transpose_1, transpose_2, transpose_3, transpose_4, transpose_5, transpose_6].to_vec();
 
     for (i, fut) in futs.iter().enumerate() {
         fill_arrays(&mut a, &mut b);
         let then = Instant::now();
         fut(&mut a, &b);
         let elapsed = then.elapsed().as_millis();
-        println!("do_it_{}:    {}ms", i, elapsed);
+        println!("transpose_{}:    {}ms", i, elapsed);
     }
 
     println!("C functions (via rustc):");

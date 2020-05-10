@@ -6,19 +6,17 @@ about cache friendly processing of arrays: https://software.intel.com/en-us/arti
 
 ## Build Rust
 
-   $ RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo run  --release
+   $ cargo build --release
 
+or build and run with:
+
+   $ cargo run --release
 
 ## Build C
 
 By way of a performance comparison the C version is included
 
     gcc -Wall -O3 -o loop_blocking loop_blocking.c
-
-
-
-
-
 
 
 

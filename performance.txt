@@ -1,3 +1,53 @@
+
+-----------------------------------------------------------------------------------
+2020-05-11 With Yato's Grid struct:
+
+Rust on x86_64:
+```
+Rust functions:
+MAX:        8192,
+BLOCK_SIZE: 64,
+
+transpose_0:    873ms
+Unimlemented
+transpose_1:    0ms
+transpose_2:    187ms
+Unimlemented
+transpose_3:    0ms
+transpose_4:    203ms
+transpose_5:    189ms
+transpose_6:    187ms
+C functions (via rustc):
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    812ms
+do_it_1:    164ms
+```
+
+-----------------------------------------------------------------------------------
+2020-05-11 With raidwas' mods to array types :
+Rust on x86_64:
+```
+Rust functions:
+MAX:        8192,
+BLOCK_SIZE: 64,
+allocated
+transpose_0:    841ms
+transpose_1:    831ms
+transpose_2:    164ms
+transpose_3:    235ms
+transpose_4:    175ms
+transpose_5:    163ms
+transpose_6:    163ms
+C functions (via rustc):
+MAX:        8192
+BLOCK_SIZE: 64
+do_it_0:    815ms
+do_it_1:    165ms
+
+```
+-----------------------------------------------------------------------------------
+2020-02-07
 Rust on x86_64:
 ```
 $ cargo run  --release

@@ -160,6 +160,21 @@ fn transpose_6(a: &mut Grid, b: &Grid) {
     }
 }
 
+fn transpose_7(a: &mut Grid, b: &Grid) {    
+    for i in (0..MAX).step_by(BLOCK_SIZE) {
+        for j in (0..MAX).step_by(BLOCK_SIZE) {
+            for ii in 0..BLOCK_SIZE {
+                for jj in 0..BLOCK_SIZE {
+                    let i = i + ii;
+                    let j = j + jj;
+
+                    a[ii][jj] = b[jj][ii];
+                }
+            }
+        }
+    }
+}
+
 fn fill_arrays(a: &mut Grid, b: &mut Grid) {    
     for i in 0..MAX {
         for j in 0..MAX {

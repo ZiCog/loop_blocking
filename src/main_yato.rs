@@ -9,9 +9,10 @@ use std::time::Instant;
 
 const MAX: usize = 8192;
 const BLOCK_SIZE: usize = 64;
+
 const BLOCKS: usize = MAX / BLOCK_SIZE;
 
-mod rustc_output;
+// mod rustc_output;
 
 use unchecked_index::unchecked_index;
 
@@ -177,17 +178,21 @@ fn transpose_7(a: &mut Grid, b: &Grid) {
     }
 }
 
-fn transpose_8(a: &mut Grid, b: &Grid) {
+pub fn transpose_8(a: &mut Grid, b: &Grid) {
     let mut i = 0;
     while i < MAX {
         let mut j = 0;
         while j < MAX {
-            for ii in i..i + BLOCK_SIZE {
-                for jj in j..j + BLOCK_SIZE {
+            let mut ii = i;
+            while ii != i + BLOCK_SIZE {
+                let mut jj = j;
+                while jj != j + BLOCK_SIZE {
                     unsafe {
                         *a.0.get_unchecked_mut(ii).get_unchecked_mut(jj) += *b.0.get_unchecked(jj).get_unchecked(ii);
                     }
+                    jj += 1
                 }
+                ii += 1
             }
             j += BLOCK_SIZE
         }
@@ -227,15 +232,17 @@ pub fn main() {
     println!("");
 
     let futs = [
-        transpose_0,
-        transpose_1,
-        transpose_2,
-        transpose_3,
-        transpose_4,
-        transpose_5,
+        // transpose_0,
+        // transpose_1,
+        // transpose_2,
+        
         transpose_6,
         transpose_7,
         transpose_8,
+
+        // transpose_3,
+        // transpose_4,
+        // transpose_5,
     ]
     .to_vec();
 
@@ -248,5 +255,5 @@ pub fn main() {
     }
 
     println!("C functions (via rustc):");
-    rustc_output::main_();
+    // rustc_output::main_();
 }

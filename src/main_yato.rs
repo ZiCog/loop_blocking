@@ -17,11 +17,14 @@ use unchecked_index::unchecked_index;
 
 use std::ops::{Index, IndexMut};
 
-pub struct Grid<T = i32>(Box<[T]>);
+pub struct Grid<T = i32>(Box<[[T; MAX]; MAX]>);
 
 impl Grid<i32> {
     pub fn new() -> Self {
-        Self(vec![0; MAX * MAX].into_boxed_slice())
+        let value = Box::into_raw(vec![0; MAX * MAX].into_boxed_slice());
+        unsafe {
+            Self(Box::from_raw(value as *mut [_] as *mut _))
+        }
     }
 }
 
@@ -29,15 +32,15 @@ impl<T> Index<usize> for Grid<T> {
     type Output = [T; MAX];
     
     fn index(&self, index: usize) -> &Self::Output {
-        let output = &self.0[index * MAX..(index + 1) * MAX];
-        unsafe { &*(output as *const [T] as *const [T; MAX]) }
+        &self.0[index]
+        // let output = &self.0[index * MAX..(index + 1) * MAX];
+        // unsafe { &*(output as *const [T] as *const [T; MAX]) }
     }
 }
 
 impl<T> IndexMut<usize> for Grid<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        let output = &mut self.0[index * MAX..(index + 1) * MAX];
-        unsafe { &mut *(output as *mut [T] as *mut [T; MAX]) }
+        &mut self.0[index]
     }
 }
 
@@ -139,39 +142,56 @@ fn transpose_5(a: &mut Grid, b: &Grid) {
 }
 
 fn transpose_6(a: &mut Grid, b: &Grid) {    
-    unsafe {
-        let mut i: usize = 0;
-        while i < MAX {
-            let mut j: usize = 0;
-            while j < MAX {
-                let mut ii = i;
-                while ii < i + BLOCK_SIZE {
-                    let mut jj = j;
-                    while jj < j + BLOCK_SIZE {
-                        a[ii][jj] += b[jj][ii];
-                        jj += 1
-                    }
-                    ii += 1
+    let mut i: usize = 0;
+    while i < MAX {
+        let mut j: usize = 0;
+        while j < MAX {
+            let mut ii = i;
+            while ii != i + BLOCK_SIZE {
+                let mut jj = j;
+                while jj != j + BLOCK_SIZE {
+                    a[ii][jj] += b[jj][ii];
+                    jj += 1
                 }
-                j += BLOCK_SIZE
+                ii += 1
             }
-            i += BLOCK_SIZE
+            j += BLOCK_SIZE
         }
+        i += BLOCK_SIZE
     }
 }
 
-fn transpose_7(a: &mut Grid, b: &Grid) {    
-    for i in (0..MAX).step_by(BLOCK_SIZE) {
-        for j in (0..MAX).step_by(BLOCK_SIZE) {
-            for ii in 0..BLOCK_SIZE {
-                for jj in 0..BLOCK_SIZE {
-                    let i = i + ii;
-                    let j = j + jj;
-
-                    a[ii][jj] = b[jj][ii];
+fn transpose_7(a: &mut Grid, b: &Grid) {
+    let mut i = 0;
+    while i < MAX {
+        let mut j = 0;
+        while j < MAX {
+            for ii in i..i + BLOCK_SIZE {
+                for jj in j..j + BLOCK_SIZE {
+                    a[ii][jj] += b[jj][ii];
                 }
             }
+            j += BLOCK_SIZE
         }
+        i += BLOCK_SIZE
+    }
+}
+
+fn transpose_8(a: &mut Grid, b: &Grid) {
+    let mut i = 0;
+    while i < MAX {
+        let mut j = 0;
+        while j < MAX {
+            for ii in i..i + BLOCK_SIZE {
+                for jj in j..j + BLOCK_SIZE {
+                    unsafe {
+                        *a.0.get_unchecked_mut(ii).get_unchecked_mut(jj) += *b.0.get_unchecked(jj).get_unchecked(ii);
+                    }
+                }
+            }
+            j += BLOCK_SIZE
+        }
+        i += BLOCK_SIZE
     }
 }
 
@@ -214,6 +234,8 @@ pub fn main() {
         transpose_4,
         transpose_5,
         transpose_6,
+        transpose_7,
+        transpose_8,
     ]
     .to_vec();
 

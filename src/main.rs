@@ -15,12 +15,12 @@ mod rustc_output;
 
 use unchecked_index::unchecked_index;
 
-type T = [[i32; MAX]];
+type Array = [[i32; MAX]; MAX];
 
 ///////////////////////// Slow non-loop-blocking transpose /////////////////////
 
 #[allow(clippy::all)]
-fn transpose_0(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_0(a: &mut Array, b: &Array) {
     assert!(a.len() <= MAX);
     assert!(b.len() <= MAX);
     for i in 0..MAX {
@@ -30,7 +30,7 @@ fn transpose_0(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     }
 }
 
-fn transpose_1(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_1(a: &mut Array, b: &Array) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
         for j in 0..MAX {
             row[j] += b[j][i];
@@ -41,7 +41,7 @@ fn transpose_1(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
 ///////////////////////// Fast loop-blocking transpose /////////////////////////
 
 #[allow(clippy::needless_range_loop)]
-fn transpose_2(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_2(a: &mut Array, b: &Array) {
     for i in 00..(MAX / BLOCK_SIZE) {
         for j in 00..(MAX / BLOCK_SIZE) {
             for ii in (i * BLOCK_SIZE)..((i * BLOCK_SIZE) + BLOCK_SIZE) {
@@ -53,7 +53,7 @@ fn transpose_2(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     }
 }
 
-fn transpose_3(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_3(a: &mut Array, b: &Array) {
     for s in 0..BLOCKS {
         for t in 0..BLOCKS {
             a.iter_mut()
@@ -74,7 +74,7 @@ fn transpose_3(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
 }
 
 #[allow(clippy::needless_range_loop)]
-fn transpose_4(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_4(a: &mut Array, b: &Array) {
     for i in (0..MAX).step_by(BLOCK_SIZE) {
         for j in (0..MAX).step_by(BLOCK_SIZE) {
             for ii in i..i + BLOCK_SIZE {
@@ -86,7 +86,7 @@ fn transpose_4(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     }
 }
 
-fn transpose_5(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_5(a: &mut Array, b: &Array) {
     unsafe {
         let mut a = unchecked_index(a);
         let b = unchecked_index(b);
@@ -110,7 +110,7 @@ fn transpose_5(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     }
 }
 
-fn transpose_6(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
+fn transpose_6(a: &mut Array, b: &Array) {
     unsafe {
         let mut i: usize = 0;
         while i < MAX {
@@ -133,7 +133,7 @@ fn transpose_6(a: &mut [[i32; MAX]; MAX], b: &[[i32; MAX]; MAX]) {
     }
 }
 
-fn fill_arrays(a: &mut [[i32; MAX]; MAX], b: &mut [[i32; MAX]; MAX]) {
+fn fill_arrays(a: &mut Array, b: &mut Array) {
     for (i, row) in a.iter_mut().enumerate().take(MAX) {
         let mut val = 0i32;
         for j in 0..MAX {
@@ -145,7 +145,7 @@ fn fill_arrays(a: &mut [[i32; MAX]; MAX], b: &mut [[i32; MAX]; MAX]) {
 }
 
 #[allow(dead_code)]
-fn print_array(a: &T) {
+fn print_array(a: &[[i32; MAX]]) {
     for row in a.iter().take(32) {
         for elem in row.iter().take(32) {
             print!("{}, ", elem);
@@ -160,13 +160,13 @@ pub fn main() {
     println!("BLOCK_SIZE: {:?}, ", BLOCK_SIZE);
 
     let mut a = unsafe {
-        let layout = std::alloc::Layout::new::<[[i32; MAX]; MAX]>();
-        let ptr = std::alloc::alloc_zeroed(layout) as *mut [[i32; MAX]; MAX];
+        let layout = std::alloc::Layout::new::<Array>();
+        let ptr = std::alloc::alloc_zeroed(layout) as *mut Array;
         Box::from_raw(ptr)
     };
     let mut b = unsafe {
-        let layout = std::alloc::Layout::new::<[[i32; MAX]; MAX]>();
-        let ptr = std::alloc::alloc_zeroed(layout) as *mut [[i32; MAX]; MAX];
+        let layout = std::alloc::Layout::new::<Array>();
+        let ptr = std::alloc::alloc_zeroed(layout) as *mut Array;
         Box::from_raw(ptr)
     };
 

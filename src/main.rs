@@ -54,6 +54,18 @@ fn transpose_2(a: &mut Array, b: &Array) {
 }
 
 fn transpose_3(a: &mut Array, b: &Array) {
+    for (_, i) in (0..(MAX / BLOCK_SIZE)).enumerate() {
+        for (_, j) in (0..(MAX / BLOCK_SIZE)).enumerate() {
+            for (_, ii) in ((i * BLOCK_SIZE)..((i * BLOCK_SIZE) + BLOCK_SIZE)).enumerate() {
+                for (_, jj) in ((j * BLOCK_SIZE)..((j * BLOCK_SIZE) + BLOCK_SIZE)).enumerate() {
+                    a[ii][jj] += b[jj][ii];
+                }
+            }
+        }
+    }
+}
+
+fn transpose_4(a: &mut Array, b: &Array) {
     for s in 0..BLOCKS {
         for t in 0..BLOCKS {
             a.iter_mut()
@@ -74,7 +86,7 @@ fn transpose_3(a: &mut Array, b: &Array) {
 }
 
 #[allow(clippy::needless_range_loop)]
-fn transpose_4(a: &mut Array, b: &Array) {
+fn transpose_5(a: &mut Array, b: &Array) {
     for i in (0..MAX).step_by(BLOCK_SIZE) {
         for j in (0..MAX).step_by(BLOCK_SIZE) {
             for ii in i..i + BLOCK_SIZE {
@@ -86,7 +98,7 @@ fn transpose_4(a: &mut Array, b: &Array) {
     }
 }
 
-fn transpose_5(a: &mut Array, b: &Array) {
+fn transpose_6(a: &mut Array, b: &Array) {
     unsafe {
         let mut a = unchecked_index(a);
         let b = unchecked_index(b);
@@ -110,7 +122,7 @@ fn transpose_5(a: &mut Array, b: &Array) {
     }
 }
 
-fn transpose_6(a: &mut Array, b: &Array) {
+fn transpose_7(a: &mut Array, b: &Array) {
     unsafe {
         let mut i: usize = 0;
         while i < MAX {
@@ -180,6 +192,7 @@ pub fn main() {
         transpose_4,
         transpose_5,
         transpose_6,
+        transpose_7,
     ]
     .to_vec();
 

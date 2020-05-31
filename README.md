@@ -16,7 +16,11 @@ or build and run with:
 
 By way of a performance comparison the C version is included
 
-    gcc -Wall -O3 -o loop_blocking loop_blocking.c
+    gcc -Wall -O3 -o loop_blocking_32 loop_blocking_32.c
+
+And using 64 bit array elements:
+
+    gcc -Wall -O3 -o loop_blocking_64 loop_blocking_64.c
 
 
 

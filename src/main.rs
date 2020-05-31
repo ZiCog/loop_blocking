@@ -9,6 +9,7 @@ use std::time::Instant;
 
 const MAX: usize = 8192;
 const BLOCK_SIZE: usize = 64;
+
 const BLOCKS: usize = MAX / BLOCK_SIZE;
 
 mod rustc_output;
@@ -42,8 +43,8 @@ fn transpose_1(a: &mut Array, b: &Array) {
 
 #[allow(clippy::needless_range_loop)]
 fn transpose_2(a: &mut Array, b: &Array) {
-    for i in 00..(MAX / BLOCK_SIZE) {
-        for j in 00..(MAX / BLOCK_SIZE) {
+    for i in 0..(MAX / BLOCK_SIZE) {
+        for j in 0..(MAX / BLOCK_SIZE) {
             for ii in (i * BLOCK_SIZE)..((i * BLOCK_SIZE) + BLOCK_SIZE) {
                 for jj in (j * BLOCK_SIZE)..((j * BLOCK_SIZE) + BLOCK_SIZE) {
                     a[ii][jj] += b[jj][ii];
@@ -157,9 +158,9 @@ fn fill_arrays(a: &mut Array, b: &mut Array) {
 }
 
 #[allow(dead_code)]
-fn print_array(a: &[[i32; MAX]]) {
-    for row in a.iter().take(32) {
-        for elem in row.iter().take(32) {
+fn print_array(a: &Array) {
+    for row in a.iter() {
+        for elem in row.iter() {
             print!("{}, ", elem);
         }
         println!();
